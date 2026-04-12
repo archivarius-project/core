@@ -1,0 +1,24 @@
+name: Mirror to Gitea
+
+on:
+  push:
+    branches: [ "*" ]
+    tags: [ "*" ]
+  delete:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to Gitea
+        env:
+          TARGET_URL: ${{ secrets.GITEA_REPO_URL }}
+        run: |
+          # Сборка URL с токеном для аутентификации
+          AUTH_URL="https://${{ secrets.GITEA_TOKEN }}@${TARGET_URL#https://}"
+          git push --mirror "$AUTH_URL"
